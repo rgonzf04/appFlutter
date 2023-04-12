@@ -6,7 +6,7 @@ class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     //Atributos
-    String email = "a";
+    String email = "";
     String password = "";
     //Widgets
     return Scaffold(
@@ -20,13 +20,18 @@ class LoginPage extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               const SizedBox(height: 80),
-              const TextField(
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  hintText: 'Email',
-                ),
-              ),
               TextField(
+                  key: const Key('emailTextField'),
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    hintText: 'Email',
+                  ),
+                  onChanged: (String value) async {
+                    email = value;
+                    debugPrint(email.toString());
+                  }),
+              TextField(
+                  key: const Key('passwordTextField'),
                   obscureText: true,
                   enableSuggestions: false,
                   autocorrect: false,
@@ -35,8 +40,8 @@ class LoginPage extends StatelessWidget {
                     hintText: 'Password',
                   ),
                   onChanged: (String value) async {
-                    email = value;
-                    debugPrint(email.toString());
+                    password = value;
+                    debugPrint(password.toString());
                   }),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
