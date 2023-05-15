@@ -35,7 +35,7 @@ class _Control extends State<Control> {
   late Topic camera;
 
   double turnAngularVelocity = 1.5;
-  double forwardVelocity = 1.5;
+  double forwardVelocity = 0.1;
 
   @override
   void initState() {
@@ -88,6 +88,10 @@ class _Control extends State<Control> {
   String msgReceived = '';
 
   var lastDirectionTwist = {};
+
+  void changeColor() {
+    c1 = Color.fromARGB(255, 187, 93, 87);
+  }
 
   void stop() {
     c1 = Color.fromARGB(255, 56, 158, 241);
@@ -149,11 +153,15 @@ class _Control extends State<Control> {
   }
 
   void velocityUp() {
-    forwardVelocity = forwardVelocity + 10;
+    if (forwardVelocity > 0.09 && forwardVelocity < 1.49) {
+      forwardVelocity = forwardVelocity + 0.1;
+    }
   }
 
   void velocityDown() {
-    forwardVelocity = forwardVelocity - 0.1;
+    if (forwardVelocity > 0.11 && forwardVelocity < 1.51) {
+      forwardVelocity = forwardVelocity - 0.1;
+    }
   }
 
   @override
@@ -173,9 +181,16 @@ class _Control extends State<Control> {
                   Expanded(
                       flex: 4,
                       child: Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Color(0xFF04589A),
+                            width: 5,
+                          ),
+                        ),
                         height: double.infinity,
                         width: double.infinity,
                         child: HoldDetector(
+                          onTap: changeColor,
                           onHold: moveForward,
                           onCancel: stop,
                           enableHapticFeedback: true,
@@ -196,7 +211,13 @@ class _Control extends State<Control> {
                         children: [
                           Expanded(
                               flex: 5,
-                              child: SizedBox(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: Color(0xFF04589A),
+                                    width: 5,
+                                  ),
+                                ),
                                 height: double.infinity,
                                 width: double.infinity,
                                 child: HoldDetector(
@@ -217,7 +238,13 @@ class _Control extends State<Control> {
                               )),
                           Expanded(
                               flex: 5,
-                              child: SizedBox(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: Color(0xFF04589A),
+                                    width: 5,
+                                  ),
+                                ),
                                 height: double.infinity,
                                 width: double.infinity,
                                 child: HoldDetector(
@@ -240,7 +267,13 @@ class _Control extends State<Control> {
                       )),
                   Expanded(
                       flex: 4,
-                      child: SizedBox(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Color(0xFF04589A),
+                            width: 5,
+                          ),
+                        ),
                         height: double.infinity,
                         width: double.infinity,
                         child: HoldDetector(
@@ -284,24 +317,45 @@ class _Control extends State<Control> {
               children: [
                 Container(
                   alignment: Alignment.center,
-                  child: Text("Velocidad Actual:" + forwardVelocity.toString()),
+                  child: Text(
+                    "Velocidad Actual:",
+                    style: TextStyle(fontSize: 20, color: Color(0xFF04589D)),
+                  ),
+                ),
+                const SizedBox(
+                  //Use of SizedBox
+                  height: 10,
+                ),
+                Container(
+                  color: Color.fromARGB(255, 185, 193, 199),
+                  margin: const EdgeInsets.only(left: 40, right: 40),
+                  alignment: Alignment.center,
+                  child: Text(
+                    forwardVelocity.toString().substring(0, 3),
+                    style: TextStyle(fontSize: 20, color: Color(0xFF04589D)),
+                  ),
+                ),
+                const SizedBox(
+                  //Use of SizedBox
+                  height: 20,
                 ),
                 Container(
                   alignment: Alignment.center,
                   child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       ElevatedButton(
                         onPressed: velocityUp,
                         child: const Icon(
-                          Icons.plus_one,
-                          size: 50,
+                          Icons.arrow_upward,
+                          size: 40,
                         ),
                       ),
                       ElevatedButton(
                         onPressed: velocityDown,
                         child: const Icon(
-                          Icons.motion_photos_auto,
-                          size: 50,
+                          Icons.arrow_downward,
+                          size: 40,
                         ),
                       ),
                     ],
