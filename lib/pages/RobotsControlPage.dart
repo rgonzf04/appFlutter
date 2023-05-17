@@ -34,7 +34,7 @@ class _Control extends State<Control> {
   late Topic cmdVelTopic;
   late Topic camera;
 
-  double turnAngularVelocity = 1.5;
+  double turnAngularVelocity = 0.5;
   double forwardVelocity = 0.1;
 
   @override
@@ -153,6 +153,7 @@ class _Control extends State<Control> {
   }
 
   void velocityUp() {
+    print(forwardVelocity);
     if (forwardVelocity > 0.09 && forwardVelocity < 1.49) {
       forwardVelocity = forwardVelocity + 0.1;
     }
@@ -164,31 +165,62 @@ class _Control extends State<Control> {
     }
   }
 
+  bool visible1 = true;
+  bool visible2 = true;
+  bool visible3 = true;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text(widget.title),
-        ),
-        body: Row(children: <Widget>[
-          Expanded(
-            flex: 4,
-            child: Container(
-              margin: const EdgeInsets.all(100),
-              alignment: Alignment.center,
-              child: Column(
-                children: [
-                  Expanded(
-                      flex: 4,
-                      child: Container(
+      appBar: AppBar(
+        title: Text(widget.title),
+      ),
+      body: CustomScrollView(
+        slivers: [
+          SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (BuildContext context, int index) {
+                return Visibility(
+                    visible: visible1,
+                    child: Container(
+                      margin: const EdgeInsets.fromLTRB(60, 30, 60, 10),
+                      alignment: Alignment.center,
+                      child: StreamBuilder(
+                          stream: camera.subscription,
+                          builder:
+                              (context2, AsyncSnapshot<dynamic> snapshot2) {
+                            if (snapshot2.hasData) {
+                              return getImagenBase64(
+                                  snapshot2.data['msg']['data']);
+                            } else {
+                              return const CircularProgressIndicator();
+                            }
+                          }),
+                    ));
+              },
+              childCount: 1,
+            ),
+          ),
+          SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (BuildContext context, int index) {
+                return Visibility(
+                    visible: visible2,
+                    child: Column(children: [
+                      Container(
+                        height: 30,
+                      ),
+                      Container(
+                        margin: EdgeInsets.symmetric(
+                            horizontal:
+                                MediaQuery.of(context).size.width * 0.1),
+                        width: MediaQuery.of(context).size.width,
                         decoration: BoxDecoration(
                           border: Border.all(
                             color: Color(0xFF04589A),
                             width: 5,
                           ),
                         ),
-                        height: double.infinity,
-                        width: double.infinity,
                         child: HoldDetector(
                           onTap: changeColor,
                           onHold: moveForward,
@@ -204,78 +236,68 @@ class _Control extends State<Control> {
                             ),
                           ),
                         ),
-                      )),
-                  Expanded(
-                      flex: 4,
-                      child: Row(
+                      ),
+                      Row(
                         children: [
-                          Expanded(
-                              flex: 5,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                    color: Color(0xFF04589A),
-                                    width: 5,
-                                  ),
+                          Container(
+                              width: MediaQuery.of(context).size.width / 2,
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Color(0xFF04589A),
+                                  width: 5,
                                 ),
-                                height: double.infinity,
-                                width: double.infinity,
-                                child: HoldDetector(
-                                  onHold: turnLeft,
-                                  onCancel: stop,
-                                  enableHapticFeedback: true,
-                                  child: ElevatedButton(
-                                    style: ButtonStyle(
-                                        backgroundColor:
-                                            MaterialStateProperty.all(c2)),
-                                    onPressed: () {},
-                                    child: const Icon(
-                                      Icons.arrow_circle_left_outlined,
-                                      size: 50,
-                                    ),
+                              ),
+                              child: HoldDetector(
+                                onHold: turnLeft,
+                                onCancel: stop,
+                                enableHapticFeedback: true,
+                                child: ElevatedButton(
+                                  style: ButtonStyle(
+                                      backgroundColor:
+                                          MaterialStateProperty.all(c2)),
+                                  onPressed: () {},
+                                  child: const Icon(
+                                    Icons.arrow_circle_left_outlined,
+                                    size: 50,
                                   ),
                                 ),
                               )),
-                          Expanded(
-                              flex: 5,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                    color: Color(0xFF04589A),
-                                    width: 5,
-                                  ),
+                          Container(
+                              width: MediaQuery.of(context).size.width / 2,
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Color(0xFF04589A),
+                                  width: 5,
                                 ),
-                                height: double.infinity,
-                                width: double.infinity,
-                                child: HoldDetector(
-                                  onHold: turnRight,
-                                  onCancel: stop,
-                                  enableHapticFeedback: true,
-                                  child: ElevatedButton(
-                                    style: ButtonStyle(
-                                        backgroundColor:
-                                            MaterialStateProperty.all(c3)),
-                                    onPressed: () {},
-                                    child: const Icon(
-                                      Icons.arrow_circle_right_outlined,
-                                      size: 50,
-                                    ),
+                              ),
+                              child: HoldDetector(
+                                onHold: turnRight,
+                                onCancel: stop,
+                                enableHapticFeedback: true,
+                                child: ElevatedButton(
+                                  style: ButtonStyle(
+                                      backgroundColor:
+                                          MaterialStateProperty.all(c3)),
+                                  onPressed: () {},
+                                  child: const Icon(
+                                    Icons.arrow_circle_right_outlined,
+                                    size: 50,
                                   ),
                                 ),
                               )),
                         ],
-                      )),
-                  Expanded(
-                      flex: 4,
-                      child: Container(
+                      ),
+                      Container(
+                        margin: EdgeInsets.symmetric(
+                            horizontal:
+                                MediaQuery.of(context).size.width * 0.1),
+                        width: MediaQuery.of(context).size.width,
                         decoration: BoxDecoration(
                           border: Border.all(
                             color: Color(0xFF04589A),
                             width: 5,
                           ),
                         ),
-                        height: double.infinity,
-                        width: double.infinity,
                         child: HoldDetector(
                           onHold: moveBackward,
                           onCancel: stop,
@@ -290,81 +312,165 @@ class _Control extends State<Control> {
                             ),
                           ),
                         ),
-                      )),
-                ],
-              ),
+                      ),
+                    ]));
+              },
+              childCount: 1,
             ),
           ),
-          Expanded(
-            flex: 4,
-            child: Container(
-              alignment: Alignment.center,
-              child: StreamBuilder(
-                  stream: camera.subscription,
-                  builder: (context2, AsyncSnapshot<dynamic> snapshot2) {
-                    if (snapshot2.hasData) {
-                      return getImagenBase64(snapshot2.data['msg']['data']);
-                    } else {
-                      return const CircularProgressIndicator();
-                    }
-                  }),
-            ),
-          ),
-          Expanded(
-            flex: 2,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  alignment: Alignment.center,
-                  child: Text(
-                    "Velocidad Actual:",
-                    style: TextStyle(fontSize: 20, color: Color(0xFF04589D)),
-                  ),
-                ),
-                const SizedBox(
-                  //Use of SizedBox
-                  height: 10,
-                ),
-                Container(
-                  color: Color.fromARGB(255, 185, 193, 199),
-                  margin: const EdgeInsets.only(left: 40, right: 40),
-                  alignment: Alignment.center,
-                  child: Text(
-                    forwardVelocity.toString().substring(0, 3),
-                    style: TextStyle(fontSize: 20, color: Color(0xFF04589D)),
-                  ),
-                ),
-                const SizedBox(
-                  //Use of SizedBox
-                  height: 20,
-                ),
-                Container(
-                  alignment: Alignment.center,
-                  child: Row(
+          SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (BuildContext context, int index) {
+                return Visibility(
+                  visible: visible3,
+                  child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      ElevatedButton(
-                        onPressed: velocityUp,
-                        child: const Icon(
-                          Icons.arrow_upward,
-                          size: 40,
+                      Container(
+                        height: 30,
+                      ),
+                      Container(
+                        alignment: Alignment.center,
+                        child: const Text(
+                          "Velocidad Actual:",
+                          style:
+                              TextStyle(fontSize: 20, color: Color(0xFF04589D)),
                         ),
                       ),
-                      ElevatedButton(
-                        onPressed: velocityDown,
-                        child: const Icon(
-                          Icons.arrow_downward,
-                          size: 40,
+                      const SizedBox(
+                        //Use of SizedBox
+                        height: 10,
+                      ),
+                      Container(
+                        color: Color.fromARGB(255, 185, 193, 199),
+                        margin: const EdgeInsets.only(left: 40, right: 40),
+                        alignment: Alignment.center,
+                        child: Text(
+                          forwardVelocity.toString().substring(0, 3),
+                          style:
+                              TextStyle(fontSize: 20, color: Color(0xFF04589D)),
+                        ),
+                      ),
+                      const SizedBox(
+                        //Use of SizedBox
+                        height: 20,
+                      ),
+                      Container(
+                        alignment: Alignment.center,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            ElevatedButton(
+                              onPressed: velocityUp,
+                              child: const Icon(
+                                Icons.arrow_upward,
+                                size: 40,
+                              ),
+                            ),
+                            ElevatedButton(
+                              onPressed: velocityDown,
+                              child: const Icon(
+                                Icons.arrow_downward,
+                                size: 40,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
                   ),
-                ),
-              ],
+                );
+              },
+              childCount: 1,
             ),
           ),
-        ]));
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => showDialog<String>(
+          context: context,
+          builder: (BuildContext context) => SimpleDialog(
+            title: const Text(
+              'Selecciona las opciones:',
+              style: TextStyle(height: 1, fontSize: 25),
+            ),
+            children: <Widget>[
+              const SimpleDialogOption(
+                onPressed: null,
+                child: Text(
+                  'Mostrar Camara',
+                  style: TextStyle(height: 1, fontSize: 15),
+                ),
+              ),
+              SimpleDialogOption(
+                onPressed: () {
+                  setState(() {
+                    visible1 = true;
+                  });
+                },
+                child: const Text('SI'),
+              ),
+              SimpleDialogOption(
+                onPressed: () {
+                  setState(() {
+                    visible1 = false;
+                  });
+                },
+                child: const Text('NO'),
+              ),
+              const SimpleDialogOption(
+                onPressed: null,
+                child: Text(
+                  'Mostrar Control Movimiento',
+                  style: TextStyle(height: 1, fontSize: 15),
+                ),
+              ),
+              SimpleDialogOption(
+                onPressed: () {
+                  setState(() {
+                    visible2 = true;
+                  });
+                },
+                child: const Text('SI'),
+              ),
+              SimpleDialogOption(
+                onPressed: () {
+                  setState(() {
+                    visible2 = false;
+                  });
+                },
+                child: const Text('NO'),
+              ),
+              const SimpleDialogOption(
+                onPressed: null,
+                child: Text(
+                  'Mostrar Velocidad',
+                  style: TextStyle(height: 1, fontSize: 15),
+                ),
+              ),
+              SimpleDialogOption(
+                onPressed: () {
+                  setState(() {
+                    visible3 = true;
+                  });
+                },
+                child: const Text('SI'),
+              ),
+              SimpleDialogOption(
+                onPressed: () {
+                  setState(() {
+                    visible3 = false;
+                  });
+                },
+                child: const Text('NO'),
+              ),
+            ],
+          ),
+        ),
+        tooltip: 'Increment Counter',
+        child: const Icon(Icons.add),
+      ),
+    );
   }
 }
 
