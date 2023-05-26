@@ -118,6 +118,34 @@ class MenuPage extends StatelessWidget {
                                   //Use of SizedBox
                                   height: 20,
                                 ),
+                                const Text(
+                                  "~ LAYOUT TÉCNICO ~",
+                                  style: TextStyle(fontSize: 15),
+                                ),
+                                Container(
+                                  //Use of SizedBox
+                                  height: 5,
+                                ),
+                                SizedBox(
+                                  width: MediaQuery.of(context).size.width / 2,
+                                  child: HoldDetector(
+                                    onHold: () {},
+                                    enableHapticFeedback: true,
+                                    child: ElevatedButton(
+                                      onPressed: () {
+                                        Navigator.pushNamed(
+                                          context,
+                                          "/robotsControl",
+                                          arguments: {'option': "C"},
+                                        );
+                                      },
+                                      child: const Icon(
+                                        Icons.science,
+                                        size: 100,
+                                      ),
+                                    ),
+                                  ),
+                                ),
                               ],
                             ),
                           ],

@@ -19,7 +19,6 @@ class RobotsControlPage extends StatelessWidget {
     final arguments = (ModalRoute.of(context)?.settings.arguments ??
         <String, dynamic>{}) as Map;
     visibility = arguments['option'];
-    print(visibility);
     return MaterialApp(
       title: title,
       home: Control(title: title),
@@ -41,6 +40,7 @@ class _Control extends State<Control> {
   late Ros ros;
   late Topic cmdVelTopic;
   late Topic camera;
+  late Topic description;
 
   double turnAngularVelocity = 0.5;
   double forwardVelocity = 0.1;
@@ -49,6 +49,7 @@ class _Control extends State<Control> {
   bool visible1 = true;
   bool visible2 = true;
   bool visible3 = true;
+  bool visible4 = false;
   bool visibleDesactivadoButton = true;
 
   //Variables cambia color dialogo
@@ -62,6 +63,7 @@ class _Control extends State<Control> {
       visible1 = true;
       visible2 = true;
       visible3 = true;
+      visible4 = false;
       visibleDesactivadoButton = true;
       co1 = Color.fromARGB(255, 199, 243, 174);
       co2 = Color.fromARGB(255, 199, 243, 174);
@@ -70,10 +72,17 @@ class _Control extends State<Control> {
       visible1 = false;
       visible2 = false;
       visible3 = false;
+      visible4 = false;
       visibleDesactivadoButton = false;
       co1 = Color.fromARGB(255, 250, 183, 167);
       co2 = Color.fromARGB(255, 250, 183, 167);
       co3 = Color.fromARGB(255, 250, 183, 167);
+    } else if (visibility == "C") {
+      visible1 = true;
+      visible2 = false;
+      visible3 = false;
+      visible4 = true;
+      visibleDesactivadoButton = true;
     }
 
     //TOPIC MOVIMIENTO
@@ -97,13 +106,40 @@ class _Control extends State<Control> {
       queueLength: 10,
     );
 
+    //TOPIC DEESCRIPTION
+
+    description = Topic(
+      ros: ros,
+      name: '/robot_description',
+      type: "std_msgs/msg/String",
+      queueSize: 10,
+      queueLength: 10,
+    );
+
     Timer(const Duration(seconds: 1), () async {
       await camera.subscribe(subscribeHandler);
       // await chatter.subscribe();
     });
 
+    Timer(const Duration(seconds: 1), () async {
+      await description.subscribe(subscribeHandler2);
+      // await chatter.subscribe();
+    });
+
     ros.connect();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    // Limpia el controlador cuando el Widget se descarte
+    controllerlx.dispose();
+    controllerly.dispose();
+    controllerlz.dispose();
+    controllerax.dispose();
+    controlleray.dispose();
+    controlleraz.dispose();
+    super.dispose();
   }
 
   Color c1 = Color.fromARGB(255, 56, 158, 241);
@@ -116,13 +152,32 @@ class _Control extends State<Control> {
     setState(() {});
   }
 
+  String msgReceived = '';
+  String robotDescription1 = "No value";
+  String robotDescription2 = "No value";
+
+  Future<void> subscribeHandler2(Map<String, dynamic> msg) async {
+    msgReceived = json.encode(msg);
+    String datos = msg['data'];
+
+    //ROBOT NAME
+    int inicio = datos.indexOf('robot name="') + 12;
+    int fin = datos.indexOf('"', inicio);
+    robotDescription1 = datos.substring(inicio, fin);
+
+    //ROBOT NAME
+    inicio = datos.indexOf('limit effort=') + 13;
+    fin = datos.indexOf('>', inicio);
+    robotDescription2 = datos.substring(inicio, fin);
+
+    setState(() {});
+  }
+
   void destroyConnection() async {
     await camera.unsubscribe();
     await ros.close();
     setState(() {});
   }
-
-  String msgReceived = '';
 
   var lastDirectionTwist = {};
 
@@ -234,6 +289,47 @@ class _Control extends State<Control> {
     });
   }
 
+  void technicalMove(String linearx, String lineary, String linearz,
+      String angularx, String angulary, String angularz) {
+    if (double.tryParse(linearx) != null &&
+        double.tryParse(lineary) != null &&
+        double.tryParse(linearz) != null &&
+        double.tryParse(angularx) != null &&
+        double.tryParse(angularx) != null &&
+        double.tryParse(angulary) != null &&
+        double.tryParse(angularz) != null) {
+      var linear = {'x': linearx, 'y': lineary, 'z': linearz};
+      var angular = {'x': angularx, 'y': angulary, 'z': angularz};
+
+      var twist = {'linear': linear, 'angular': angular};
+
+      print("Velocidad: $twist");
+      cmdVelTopic.publish(twist);
+      lastDirectionTwist = twist;
+    } else {
+      showDialog<String>(
+        context: context,
+        builder: (BuildContext context) => AlertDialog(
+          title: const Text('Exception'),
+          content: Text('The value of the fields must be double'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.pop(context, 'OK'),
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
+  final controllerlx = TextEditingController();
+  final controllerly = TextEditingController();
+  final controllerlz = TextEditingController();
+  final controllerax = TextEditingController();
+  final controlleray = TextEditingController();
+  final controlleraz = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -242,10 +338,40 @@ class _Control extends State<Control> {
       ),
       body: Column(
         children: [
+          Container(
+            margin: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+            alignment: Alignment.center,
+            child: TextButton(
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.all(20.0),
+                textStyle: const TextStyle(fontSize: 30),
+              ),
+              onPressed: () => showDialog<String>(
+                context: context,
+                builder: (BuildContext context) => AlertDialog(
+                  title: const Text('Robot Information'),
+                  content: Text('Robots name: $robotDescription1'
+                      '\n'
+                      'Robots features: $robotDescription2'),
+                  actions: <Widget>[
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, 'Cancel'),
+                      child: const Text('Cancel'),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, 'OK'),
+                      child: const Text('OK'),
+                    ),
+                  ],
+                ),
+              ),
+              child: const Text('-> Robot Information <-'),
+            ),
+          ),
           Visibility(
               visible: visible1,
               child: Container(
-                margin: const EdgeInsets.fromLTRB(60, 30, 60, 10),
+                margin: const EdgeInsets.fromLTRB(25, 0, 25, 10),
                 alignment: Alignment.center,
                 child: StreamBuilder(
                     stream: camera.subscription,
@@ -420,6 +546,67 @@ class _Control extends State<Control> {
               ],
             ),
           ),
+          Visibility(
+              visible: visible4,
+              child: Container(
+                  margin: const EdgeInsets.fromLTRB(25, 0, 25, 0),
+                  alignment: Alignment.center,
+                  child: Column(
+                    children: [
+                      const Text(
+                        'Linear velocity',
+                      ),
+                      TextFormField(
+                        controller: controllerlx,
+                        decoration: const InputDecoration(
+                          labelText: 'eje x',
+                        ),
+                      ),
+                      TextFormField(
+                          controller: controllerly,
+                          decoration: const InputDecoration(
+                            labelText: 'eje y',
+                          )),
+                      TextFormField(
+                          controller: controllerlz,
+                          decoration: const InputDecoration(
+                            labelText: 'eje z',
+                          )),
+                      const Text(
+                        'Angular velocity',
+                      ),
+                      TextFormField(
+                          controller: controllerax,
+                          decoration: const InputDecoration(
+                            labelText: 'eje x',
+                          )),
+                      TextFormField(
+                          controller: controlleray,
+                          decoration: const InputDecoration(
+                            labelText: 'eje y',
+                          )),
+                      TextFormField(
+                          controller: controlleraz,
+                          decoration: const InputDecoration(
+                            labelText: 'eje z',
+                          )),
+                      TextButton(
+                          style: TextButton.styleFrom(
+                            padding: const EdgeInsets.all(5.0),
+                            textStyle: const TextStyle(fontSize: 15),
+                          ),
+                          onPressed: () {
+                            technicalMove(
+                                controllerlx.text,
+                                controllerly.text,
+                                controllerlz.text,
+                                controllerax.text,
+                                controlleray.text,
+                                controlleraz.text);
+                          },
+                          child: const Text("ACEPTAR"))
+                    ],
+                  ))),
         ],
       ),
       floatingActionButton: FloatingActionButton(
@@ -539,7 +726,7 @@ Widget getImagenBase64(String imagen) {
   return Image.memory(
     bytes,
     gaplessPlayback: true,
-    height: 480,
+    height: 320,
     width: 720,
     fit: BoxFit.fitWidth,
   );
