@@ -179,8 +179,6 @@ class _Control extends State<Control> {
     setState(() {});
   }
 
-  var lastDirectionTwist = {};
-
   void changeColor() {
     c1 = Color.fromARGB(255, 187, 93, 87);
   }
@@ -196,7 +194,6 @@ class _Control extends State<Control> {
     var twist = {'linear': linear, 'angular': angular};
 
     cmdVelTopic.publish(twist);
-    lastDirectionTwist = twist;
   }
 
   void moveForward() {
@@ -206,9 +203,8 @@ class _Control extends State<Control> {
 
     var twist = {'linear': linear, 'angular': angular};
 
-    print('Direction to published ' + jsonEncode(twist));
+    //print('Direction to published ' + jsonEncode(twist));
     cmdVelTopic.publish(twist);
-    lastDirectionTwist = twist;
   }
 
   void moveBackward() {
@@ -219,7 +215,6 @@ class _Control extends State<Control> {
     var twist = {'linear': linear, 'angular': angular};
 
     cmdVelTopic.publish(twist);
-    lastDirectionTwist = twist;
   }
 
   void turnRight() {
@@ -230,7 +225,6 @@ class _Control extends State<Control> {
     var twist = {'linear': linear, 'angular': angular};
 
     cmdVelTopic.publish(twist);
-    lastDirectionTwist = twist;
   }
 
   void turnLeft() {
@@ -241,7 +235,6 @@ class _Control extends State<Control> {
     var twist = {'linear': linear, 'angular': angular};
 
     cmdVelTopic.publish(twist);
-    lastDirectionTwist = twist;
   }
 
   void velocityUp() {
@@ -295,23 +288,29 @@ class _Control extends State<Control> {
         double.tryParse(lineary) != null &&
         double.tryParse(linearz) != null &&
         double.tryParse(angularx) != null &&
-        double.tryParse(angularx) != null &&
         double.tryParse(angulary) != null &&
         double.tryParse(angularz) != null) {
-      var linear = {'x': linearx, 'y': lineary, 'z': linearz};
-      var angular = {'x': angularx, 'y': angulary, 'z': angularz};
+      var linear = {
+        'x': double.parse(linearx),
+        'y': double.parse(lineary),
+        'z': double.parse(linearz)
+      };
+      var angular = {
+        'x': double.parse(angularx),
+        'y': double.parse(angulary),
+        'z': double.parse(angularz)
+      };
 
       var twist = {'linear': linear, 'angular': angular};
 
-      print("Velocidad: $twist");
+      //print("Velocidad: $twist");
       cmdVelTopic.publish(twist);
-      lastDirectionTwist = twist;
     } else {
       showDialog<String>(
         context: context,
         builder: (BuildContext context) => AlertDialog(
           title: const Text('Exception'),
-          content: Text('The value of the fields must be double'),
+          content: const Text('The value of the fields must be double'),
           actions: <Widget>[
             TextButton(
               onPressed: () => Navigator.pop(context, 'OK'),
