@@ -7,6 +7,8 @@ import 'package:app/pages/RobotsListPage.dart';
 import 'package:app/pages/SettingsPage.dart';
 import 'package:app/pages/SignUpPage.dart';
 
+import 'package:adaptive_theme/adaptive_theme.dart';
+
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
@@ -24,10 +26,25 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Material App',
-      initialRoute: '/login',
-      routes: _routes,
+    return AdaptiveTheme(
+      light: ThemeData(
+        brightness: Brightness.light,
+        primarySwatch: Colors.red,
+        accentColor: Colors.amber,
+      ),
+      dark: ThemeData(
+        brightness: Brightness.dark,
+        primarySwatch: Colors.red,
+        accentColor: Colors.amber,
+      ),
+      initial: AdaptiveThemeMode.light,
+      builder: (theme, darkTheme) => MaterialApp(
+        theme: theme,
+        darkTheme: darkTheme,
+        title: 'Material App',
+        initialRoute: '/login',
+        routes: _routes,
+      ),
     );
   }
 }

@@ -1,3 +1,4 @@
+import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatelessWidget {
@@ -55,6 +56,8 @@ class LoginPage extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                     minimumSize: const Size.fromHeight(50)),
                 onPressed: () {
+                  // sets theme mode to dark
+
                   Navigator.pushNamed(context, "/menu");
                 },
                 child: const Text('INICIAR SESIÓN'),

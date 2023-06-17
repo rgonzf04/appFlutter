@@ -42,6 +42,7 @@ class _Control extends State<Control> {
   late Topic cmdVelTopic;
   late Topic camera;
   late Topic description;
+  late Topic odometry;
 
   double turnAngularVelocity = 0.5;
   double forwardVelocity = 0.1;
@@ -117,6 +118,16 @@ class _Control extends State<Control> {
       queueLength: 10,
     );
 
+    //TOPIC ODOMETRY
+
+    odometry = Topic(
+      ros: ros,
+      name: '/odom',
+      type: "nav_msgs/msg/Odometry",
+      queueSize: 10,
+      queueLength: 10,
+    );
+
     Timer(const Duration(seconds: 1), () async {
       await camera.subscribe(subscribeHandler);
       // await chatter.subscribe();
@@ -124,6 +135,11 @@ class _Control extends State<Control> {
 
     Timer(const Duration(seconds: 1), () async {
       await description.subscribe(subscribeHandler2);
+      // await chatter.subscribe();
+    });
+
+    Timer(const Duration(seconds: 10), () async {
+      await odometry.subscribe(subscribeHandler3);
       // await chatter.subscribe();
     });
 
@@ -171,6 +187,13 @@ class _Control extends State<Control> {
     inicio = datos.indexOf('limit effort=') + 13;
     fin = datos.indexOf('>', inicio);
     robotDescription2 = datos.substring(inicio, fin);
+
+    setState(() {});
+  }
+
+  Future<void> subscribeHandler3(Map<String, dynamic> msg) async {
+    msgReceived = json.encode(msg);
+    print(msgReceived);
 
     setState(() {});
   }

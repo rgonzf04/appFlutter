@@ -17,24 +17,6 @@ class MenuPage extends StatelessWidget {
             Expanded(
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.pushNamed(context, "/login");
-                },
-                child: const Text('Cerrar sesión'),
-              ),
-            ),
-            Container(height: 20.0),
-            Expanded(
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, "/profile");
-                },
-                child: const Text('Ver perfil'),
-              ),
-            ),
-            Container(height: 20.0),
-            Expanded(
-              child: ElevatedButton(
-                onPressed: () {
                   Navigator.pushNamed(context, "/robotsList");
                 },
                 child: const Text('Conectar robot'),
