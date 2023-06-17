@@ -38,6 +38,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   roslibdart: ^0.0.1-dev+2
   holding_gesture: ^1.1.0
+  intro_views_flutter: ^3.2.0
 
 dev_dependencies:
   flutter_test:

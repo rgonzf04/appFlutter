@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:roslibdart/roslibdart.dart';
 import 'dart:convert';
 import 'package:holding_gesture/holding_gesture.dart';
+import 'package:intro_views_flutter/intro_views_flutter.dart';
 
 String visibility = "default";
 
@@ -157,6 +158,7 @@ class _Control extends State<Control> {
   String robotDescription2 = "No value";
 
   Future<void> subscribeHandler2(Map<String, dynamic> msg) async {
+    print("HOLA");
     msgReceived = json.encode(msg);
     String datos = msg['data'];
 
@@ -175,6 +177,7 @@ class _Control extends State<Control> {
 
   void destroyConnection() async {
     await camera.unsubscribe();
+    await description.unsubscribe();
     await ros.close();
     setState(() {});
   }
@@ -328,6 +331,68 @@ class _Control extends State<Control> {
   final controllerax = TextEditingController();
   final controlleray = TextEditingController();
   final controlleraz = TextEditingController();
+
+  String salidaComando = "";
+
+  final pages = [
+    PageViewModel(
+      pageColor: Color(0xFF03A9F4),
+      // iconImageAssetPath: 'assets/air-hostess.png',
+      //bubble: Image.asset('assets/air-hostess.png'),
+      body: Text(
+        'En primer lugar debes localizar el nombre y tipo del Topic, para ello existen diversas formas como el software rqt o el comadno "ros2 topic list -t"',
+      ),
+      mainImage: Image.asset(
+        'tutorial1.png',
+        height: 385.0,
+        width: 385.0,
+        alignment: Alignment.center,
+      ),
+      title: Text(
+        'Localizar el topic',
+      ),
+      titleTextStyle: TextStyle(fontFamily: 'MyFont', color: Colors.white),
+      bodyTextStyle: TextStyle(fontFamily: 'MyFont', color: Colors.white),
+    ),
+    PageViewModel(
+      pageColor: Color.fromARGB(255, 60, 192, 253),
+      // iconImageAssetPath: 'assets/air-hostess.png',
+      //bubble: Image.asset('assets/air-hostess.png'),
+      body: Text(
+        'Con el uso de la librería roslibdart crearemos un objeto de tipo Topic especificando su nombre y tipo.',
+      ),
+      mainImage: Image.asset(
+        'tutorial2.png',
+        height: 385.0,
+        width: 385.0,
+        alignment: Alignment.center,
+      ),
+      title: Text(
+        'Crear objeto',
+      ),
+      titleTextStyle: TextStyle(fontFamily: 'MyFont', color: Colors.white),
+      bodyTextStyle: TextStyle(fontFamily: 'MyFont', color: Colors.white),
+    ),
+    PageViewModel(
+      pageColor: Color.fromARGB(255, 118, 204, 245),
+      // iconImageAssetPath: 'assets/air-hostess.png',
+      //bubble: Image.asset('assets/air-hostess.png'),
+      body: Text(
+        'Por último nuevamente gracias a la librería roslibdart podremos suscribirnos al Topic y obetener su información.',
+      ),
+      mainImage: Image.asset(
+        'tutorial3.png',
+        height: 385.0,
+        width: 385.0,
+        alignment: Alignment.center,
+      ),
+      title: Text(
+        'Obtener información del topic',
+      ),
+      titleTextStyle: TextStyle(fontFamily: 'MyFont', color: Colors.white),
+      bodyTextStyle: TextStyle(fontFamily: 'MyFont', color: Colors.white),
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -620,6 +685,7 @@ class _Control extends State<Control> {
                           title: const Text("Seleccione las funcionalidades:"),
                           actions: <Widget>[
                             Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Row(
                                   children: [
@@ -700,6 +766,25 @@ class _Control extends State<Control> {
                                 TextButton(
                                   onPressed: () => Navigator.pop(context),
                                   child: const Text("Hecho"),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => IntroViewsFlutter(
+                                          pages,
+                                          doneText: Text("Finalizar"),
+                                          onTapDoneButton: () {
+                                            Navigator.pop(
+                                                context); // Cerrar el tutorial cuando se hace clic en "Finalizar"
+                                          },
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  child:
+                                      Text("¿Quieres añadir funcionaldiades?"),
                                 ),
                               ],
                             ),
