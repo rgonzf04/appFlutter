@@ -9,6 +9,18 @@ import 'package:holding_gesture/holding_gesture.dart';
 import 'package:intro_views_flutter/intro_views_flutter.dart';
 
 String visibility = "default";
+String robotID = "";
+var base = "";
+String odometryText = "";
+Map<String, dynamic> odometryInformation = {
+  "pose": {
+    "pose": {
+      "position": {"x": 0, "y": 0, "z": 0},
+      "orientation": {"x": 0, "y": 0, "z": 0, "w": 0}
+    },
+  }
+};
+String tiempoConexion = "0";
 
 class RobotsControlPage extends StatelessWidget {
   const RobotsControlPage({Key? key}) : super(key: key);
@@ -20,6 +32,7 @@ class RobotsControlPage extends StatelessWidget {
     final arguments = (ModalRoute.of(context)?.settings.arguments ??
         <String, dynamic>{}) as Map;
     visibility = arguments['option'];
+    robotID = arguments['id'];
     return MaterialApp(
       title: title,
       home: Control(title: title),
@@ -37,12 +50,15 @@ class Control extends StatefulWidget {
 }
 
 class _Control extends State<Control> {
-  String host = 'ws://127.0.0.1:9090';
+  //String host = 'ws://127.0.0.1:9090';
+  String host = robotID;
   late Ros ros;
   late Topic cmdVelTopic;
   late Topic camera;
   late Topic description;
   late Topic odometry;
+  late Topic clock;
+  late Topic goalPose;
 
   double turnAngularVelocity = 0.5;
   double forwardVelocity = 0.1;
@@ -52,12 +68,18 @@ class _Control extends State<Control> {
   bool visible2 = true;
   bool visible3 = true;
   bool visible4 = false;
+  bool visible5 = false;
+  bool visible6 = false;
+  bool visible7 = false;
   bool visibleDesactivadoButton = true;
 
   //Variables cambia color dialogo
   Color co1 = Color.fromARGB(255, 250, 183, 167);
   Color co2 = Color.fromARGB(255, 250, 183, 167);
   Color co3 = Color.fromARGB(255, 250, 183, 167);
+  Color co5 = Color.fromARGB(255, 250, 183, 167);
+  Color co6 = Color.fromARGB(255, 250, 183, 167);
+  Color co7 = Color.fromARGB(255, 250, 183, 167);
 
   @override
   void initState() {
@@ -66,6 +88,9 @@ class _Control extends State<Control> {
       visible2 = true;
       visible3 = true;
       visible4 = false;
+      visible5 = false;
+      visible6 = false;
+      visible7 = true;
       visibleDesactivadoButton = true;
       co1 = Color.fromARGB(255, 199, 243, 174);
       co2 = Color.fromARGB(255, 199, 243, 174);
@@ -75,6 +100,9 @@ class _Control extends State<Control> {
       visible2 = false;
       visible3 = false;
       visible4 = false;
+      visible5 = false;
+      visible6 = false;
+      visible7 = false;
       visibleDesactivadoButton = false;
       co1 = Color.fromARGB(255, 250, 183, 167);
       co2 = Color.fromARGB(255, 250, 183, 167);
@@ -84,6 +112,9 @@ class _Control extends State<Control> {
       visible2 = false;
       visible3 = false;
       visible4 = true;
+      visible5 = false;
+      visible6 = false;
+      visible7 = false;
       visibleDesactivadoButton = true;
     }
 
@@ -128,6 +159,24 @@ class _Control extends State<Control> {
       queueLength: 10,
     );
 
+    // TOPIC CLOCK
+
+    clock = Topic(
+      ros: ros,
+      name: '/clock',
+      type: "rosgraph_msgs/msg/Clock",
+      queueSize: 10,
+      queueLength: 10,
+    );
+
+    goalPose = Topic(
+      ros: ros,
+      name: '/goal_pose',
+      type: "geometry_msgs/msg/PoseStamped",
+      queueSize: 10,
+      queueLength: 10,
+    );
+
     Timer(const Duration(seconds: 1), () async {
       await camera.subscribe(subscribeHandler);
       // await chatter.subscribe();
@@ -138,8 +187,18 @@ class _Control extends State<Control> {
       // await chatter.subscribe();
     });
 
-    Timer(const Duration(seconds: 10), () async {
+    Timer(const Duration(seconds: 2), () async {
       await odometry.subscribe(subscribeHandler3);
+      // await chatter.subscribe();
+    });
+
+    Timer(const Duration(seconds: 2), () async {
+      await clock.subscribe(subscribeHandler4);
+      // await chatter.subscribe();
+    });
+
+    Timer(const Duration(seconds: 2), () async {
+      await goalPose.subscribe(subscribeHandler5);
       // await chatter.subscribe();
     });
 
@@ -193,6 +252,24 @@ class _Control extends State<Control> {
 
   Future<void> subscribeHandler3(Map<String, dynamic> msg) async {
     msgReceived = json.encode(msg);
+
+    odometryInformation = msg;
+    odometryText = msg['pose'].toString();
+
+    setState(() {});
+  }
+
+  Future<void> subscribeHandler4(Map<String, dynamic> msg) async {
+    msgReceived = json.encode(msg);
+    //print(msg['clock']['sec']);
+    tiempoConexion = msg['clock']['sec'].toString();
+
+    setState(() {});
+  }
+
+  Future<void> subscribeHandler5(Map<String, dynamic> msg) async {
+    msgReceived = json.encode(msg);
+
     print(msgReceived);
 
     setState(() {});
@@ -303,6 +380,33 @@ class _Control extends State<Control> {
         } else {
           visible3 = true;
           co3 = Color.fromARGB(255, 199, 243, 174);
+        }
+      }
+      if (option == 5) {
+        if (visible5 == true) {
+          visible5 = false;
+          co5 = Color.fromARGB(255, 250, 183, 167);
+        } else {
+          visible5 = true;
+          co5 = Color.fromARGB(255, 199, 243, 174);
+        }
+      }
+      if (option == 6) {
+        if (visible6 == true) {
+          visible6 = false;
+          co6 = Color.fromARGB(255, 250, 183, 167);
+        } else {
+          visible6 = true;
+          co6 = Color.fromARGB(255, 199, 243, 174);
+        }
+      }
+      if (option == 7) {
+        if (visible7 == true) {
+          visible7 = false;
+          co7 = Color.fromARGB(255, 250, 183, 167);
+        } else {
+          visible7 = true;
+          co7 = Color.fromARGB(255, 199, 243, 174);
         }
       }
     });
@@ -425,34 +529,37 @@ class _Control extends State<Control> {
       ),
       body: Column(
         children: [
-          Container(
-            margin: const EdgeInsets.fromLTRB(0, 10, 0, 10),
-            alignment: Alignment.center,
-            child: TextButton(
-              style: TextButton.styleFrom(
-                padding: const EdgeInsets.all(20.0),
-                textStyle: const TextStyle(fontSize: 30),
-              ),
-              onPressed: () => showDialog<String>(
-                context: context,
-                builder: (BuildContext context) => AlertDialog(
-                  title: const Text('Robot Information'),
-                  content: Text('Robots name: $robotDescription1'
-                      '\n'
-                      'Robots features: $robotDescription2'),
-                  actions: <Widget>[
-                    TextButton(
-                      onPressed: () => Navigator.pop(context, 'Cancel'),
-                      child: const Text('Cancel'),
-                    ),
-                    TextButton(
-                      onPressed: () => Navigator.pop(context, 'OK'),
-                      child: const Text('OK'),
-                    ),
-                  ],
+          Visibility(
+            visible: visible7,
+            child: Container(
+              margin: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+              alignment: Alignment.center,
+              child: TextButton(
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.all(20.0),
+                  textStyle: const TextStyle(fontSize: 30),
                 ),
+                onPressed: () => showDialog<String>(
+                  context: context,
+                  builder: (BuildContext context) => AlertDialog(
+                    title: const Text('Robot Information'),
+                    content: Text('Robots name: $robotDescription1'
+                        '\n'
+                        'Robots features: $robotDescription2'),
+                    actions: <Widget>[
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, 'Cancel'),
+                        child: const Text('Cancel'),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, 'OK'),
+                        child: const Text('OK'),
+                      ),
+                    ],
+                  ),
+                ),
+                child: const Text('-> Robot Information <-'),
               ),
-              child: const Text('-> Robot Information <-'),
             ),
           ),
           Visibility(
@@ -463,10 +570,16 @@ class _Control extends State<Control> {
                 child: StreamBuilder(
                     stream: camera.subscription,
                     builder: (context2, AsyncSnapshot<dynamic> snapshot2) {
-                      if (snapshot2.hasData) {
+                      if (snapshot2.hasData &&
+                          snapshot2.data['msg']['data'] != null) {
+                        base = snapshot2.data['msg']['data'];
                         return getImagenBase64(snapshot2.data['msg']['data']);
                       } else {
-                        return const CircularProgressIndicator();
+                        if (base == "") {
+                          return const CircularProgressIndicator();
+                        } else {
+                          return getImagenBase64(base);
+                        }
                       }
                     }),
               )),
@@ -694,6 +807,14 @@ class _Control extends State<Control> {
                           child: const Text("ACEPTAR"))
                     ],
                   ))),
+          Visibility(
+            visible: visible5,
+            child: OdometryInformation(),
+          ),
+          Visibility(
+            visible: visible6,
+            child: clockData(),
+          ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
@@ -780,6 +901,77 @@ class _Control extends State<Control> {
                                       //Use of SizedBox
                                       width: 10,
                                     ),
+                                    HoldDetector(
+                                      onHold: () {},
+                                      enableHapticFeedback: true,
+                                      child: ElevatedButton(
+                                        style: ButtonStyle(
+                                            backgroundColor:
+                                                MaterialStateProperty.all(co5)),
+                                        onPressed: () {
+                                          setState(() {});
+                                          changeValue(5);
+                                        },
+                                        child: const Icon(
+                                          Icons.threesixty,
+                                          size: 100,
+                                        ),
+                                      ),
+                                    ),
+                                    Container(
+                                      //Use of SizedBox
+                                      width: 10,
+                                    ),
+                                  ],
+                                ),
+                                Container(
+                                  //Use of SizedBox
+                                  height: 10,
+                                ),
+                                Row(
+                                  children: [
+                                    HoldDetector(
+                                      onHold: () {},
+                                      enableHapticFeedback: true,
+                                      child: ElevatedButton(
+                                        style: ButtonStyle(
+                                            backgroundColor:
+                                                MaterialStateProperty.all(co6)),
+                                        onPressed: () {
+                                          setState(() {});
+                                          changeValue(6);
+                                        },
+                                        child: const Icon(
+                                          Icons.lock_clock,
+                                          size: 100,
+                                        ),
+                                      ),
+                                    ),
+                                    Container(
+                                      //Use of SizedBox
+                                      width: 10,
+                                    ),
+                                    HoldDetector(
+                                      onHold: () {},
+                                      enableHapticFeedback: true,
+                                      child: ElevatedButton(
+                                        style: ButtonStyle(
+                                            backgroundColor:
+                                                MaterialStateProperty.all(co7)),
+                                        onPressed: () {
+                                          setState(() {});
+                                          changeValue(7);
+                                        },
+                                        child: const Icon(
+                                          Icons.info,
+                                          size: 100,
+                                        ),
+                                      ),
+                                    ),
+                                    Container(
+                                      //Use of SizedBox
+                                      width: 10,
+                                    ),
                                   ],
                                 ),
                                 Container(
@@ -837,4 +1029,93 @@ Widget getImagenBase64(String imagen) {
     width: 720,
     fit: BoxFit.fitWidth,
   );
+}
+
+class OdometryInformation extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() {
+    return OdometryInformationState();
+  }
+}
+
+class OdometryInformationState extends State<OdometryInformation> {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+          height: 30,
+        ),
+        Container(
+          alignment: Alignment.center,
+          child: const Text(
+            "Odometría:",
+            style: TextStyle(fontSize: 20, color: Color(0xFF04589D)),
+          ),
+        ),
+        const SizedBox(
+          //Use of SizedBox
+          height: 10,
+        ),
+        Text("Pose:"),
+        Text("x: " +
+            odometryInformation["pose"]["pose"]["position"]["x"].toString()),
+        Text("y: " +
+            odometryInformation["pose"]["pose"]["position"]["y"].toString()),
+        Text("z: " +
+            odometryInformation["pose"]["pose"]["position"]["z"].toString()),
+        Text("Orientación:"),
+        Text("x: " +
+            odometryInformation["pose"]["pose"]["orientation"]["x"].toString()),
+        Text("y: " +
+            odometryInformation["pose"]["pose"]["orientation"]["y"].toString()),
+        Text("z: " +
+            odometryInformation["pose"]["pose"]["orientation"]["z"].toString()),
+        Text("w: " +
+            odometryInformation["pose"]["pose"]["orientation"]["w"].toString()),
+        const SizedBox(
+          //Use of SizedBox
+          height: 10,
+        ),
+      ],
+    );
+  }
+}
+
+class clockData extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() {
+    return clockDataState();
+  }
+}
+
+class clockDataState extends State<clockData> {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+          height: 30,
+        ),
+        Container(
+          alignment: Alignment.center,
+          child: const Text(
+            "Tiempo de conexion: ",
+            style: TextStyle(fontSize: 20, color: Color(0xFF04589D)),
+          ),
+        ),
+        const SizedBox(
+          //Use of SizedBox
+          height: 10,
+        ),
+        Text(tiempoConexion + " segundos."),
+        const SizedBox(
+          //Use of SizedBox
+          height: 10,
+        ),
+      ],
+    );
+  }
 }

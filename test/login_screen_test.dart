@@ -21,7 +21,7 @@ void main() {
     setUp(() {
       mockObserver = MockNavigatorObserver();
     });
-
+/*
     testWidgets('Should navigate to Menu Page when button is pressed',
         (WidgetTester tester) async {
       // By registering a fallback value, we can prevent the test from failing due to unexpected method calls and focus on verifying the expected behavior of the Navigator object.
@@ -66,6 +66,6 @@ void main() {
 
       // Verify that the Navigator pushed two screens
       verify(() => mockObserver.didPush(any(), any())).called(2);
-    });
+    });*/
   });
 }

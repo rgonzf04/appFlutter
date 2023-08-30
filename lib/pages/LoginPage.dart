@@ -6,67 +6,73 @@ class LoginPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    //Atributos
-    String email = "";
-    String password = "";
     //Widgets
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Login Screen"),
-      ),
-      body: Center(
-        child: IntrinsicWidth(
-          stepWidth: 300,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              const SizedBox(height: 80),
-              TextField(
-                  key: const Key('emailTextField'),
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    hintText: 'Email',
-                  ),
-                  onChanged: (String value) async {
-                    email = value;
-                    debugPrint(email.toString());
-                  }),
-              TextField(
-                  key: const Key('passwordTextField'),
-                  obscureText: true,
-                  enableSuggestions: false,
-                  autocorrect: false,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    hintText: 'Password',
-                  ),
-                  onChanged: (String value) async {
-                    password = value;
-                    debugPrint(password.toString());
-                  }),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                    minimumSize: const Size.fromHeight(50)),
-                onPressed: () {
-                  Navigator.pushNamed(context, "/signUp");
-                },
-                child: const Text('REGISTRARSE'),
-              ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                    minimumSize: const Size.fromHeight(50)),
-                onPressed: () {
-                  // sets theme mode to dark
-
-                  Navigator.pushNamed(context, "/menu");
-                },
-                child: const Text('INICIAR SESIÓN'),
-              ),
-              const SizedBox(height: 80),
+    return Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment(0.0, 0.0),
+            end: Alignment(0.25, 0.75),
+            colors: <Color>[
+              Color.fromARGB(255, 24, 58, 102),
+              Color.fromARGB(255, 141, 213, 247),
             ],
           ),
         ),
-      ),
-    );
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Expanded(
+              flex: 2,
+              child: Image.asset(
+                'rover.png',
+                height: 385.0,
+                width: 385.0,
+                alignment: Alignment.center,
+              ),
+            ),
+            Expanded(
+              flex: 1,
+              child: Container(
+                margin: EdgeInsets.all(
+                    40.0), // Establece un margin de 10 en todas las direcciones
+                alignment: Alignment.center, // Expande horizontalmente y centra
+                child: const Text(
+                  'Conecta tu robot para poder observar su cámara, controlar su movimiento, velocidad ...',
+                  style: TextStyle(
+                      fontSize: 30,
+                      decoration: TextDecoration.none,
+                      fontFamily: 'RobotoMono',
+                      color: Colors.white),
+                ),
+              ),
+            ),
+            Expanded(
+              flex: 1,
+              child: Container(
+                margin: EdgeInsets.all(
+                    80.0), // Establece un margin de 10 en todas las direcciones
+                alignment: Alignment.center, // Expande horizontalmente y centra
+
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      minimumSize: const Size.fromHeight(100)),
+                  onPressed: () {
+                    // sets theme mode to dark
+
+                    Navigator.pushNamed(context, "/menu");
+                  },
+                  child: const Text(
+                    'COMENZAR',
+                    style: TextStyle(fontSize: 50),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ));
   }
 }
+
+/*
+
+*/
