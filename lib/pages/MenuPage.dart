@@ -178,7 +178,7 @@ class MenuPage extends StatelessWidget {
                 Navigator.pushNamed(context, "/settings");
               },
               child: const Text(
-                '       Ajustes       ',
+                '        Ayuda        ',
                 style: TextStyle(fontSize: 30),
               ),
             ),

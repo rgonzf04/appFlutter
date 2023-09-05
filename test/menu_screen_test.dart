@@ -1,16 +1,16 @@
-import 'package:app/pages/HomePage.dart';
+import 'package:app/pages/MenuPage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
-final buttonStart = find.text('COMENZAR');
+final buttonHelp = find.text('        Ayuda        ');
 
 class MockNavigatorObserver extends Mock implements NavigatorObserver {}
 
 class MockRoute extends Mock implements Route<dynamic> {}
 
 void main() {
-  group('Home Page Tests', () {
+  group('Menu Page Tests', () {
     //mock class that can be used to test navigation events
     late MockNavigatorObserver mockObserver;
 
@@ -25,12 +25,12 @@ void main() {
 
       // Build the widget tree
       await tester.pumpWidget(MaterialApp(
-        home: const HomePage(),
+        home: const MenuPage(),
         navigatorObservers: [mockObserver],
-        routes: {'/menu': (_) => const Text('Menu Page')},
+        routes: {'/help': (_) => const Text('Help Page')},
       ));
 
-      await tester.tap(buttonStart);
+      await tester.tap(buttonHelp);
 
       // Rebuild the widget tree and wait until all asynchronous operations are complete
       await tester.pumpAndSettle();

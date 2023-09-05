@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intro_views_flutter/intro_views_flutter.dart';
 
-class SettingsPage extends StatelessWidget {
-  const SettingsPage({super.key});
+class HelpPage extends StatelessWidget {
+  const HelpPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +68,7 @@ class SettingsPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Settings Screen"),
+        title: const Text("Help Screen"),
       ),
       body: Center(
         child: Column(children: [
