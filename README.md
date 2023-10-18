@@ -1,8 +1,8 @@
-# app
+# App Name
 
 Aplicación multiplataforma para la teleoperación robótica.
 
-## Getting Started
+## App Description
 
 El continuo desarrollo del mundo de la robótica hace que cada vez sea más común
 ver robots en hospitales, negocios o incluso por la calle. Además, cada vez son
